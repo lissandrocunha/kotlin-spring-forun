@@ -1,5 +1,6 @@
 package dev.lissandrocunha.forum.service
 
+import dev.lissandrocunha.forum.dto.AtualizarTopicoForm
 import dev.lissandrocunha.forum.dto.NovoTopicoForm
 import dev.lissandrocunha.forum.dto.TopicoView
 import dev.lissandrocunha.forum.mapper.TopicoFormMapper
@@ -29,9 +30,34 @@ class TopicoService(
         return topicoViewMapper.map(topico)
     }
 
-    fun cadastrar(dto: NovoTopicoForm) {
-        val topico = topicoFormMapper.map(dto)
+    fun cadastrar(form: NovoTopicoForm) {
+        val topico = topicoFormMapper.map(form)
         topico.id = topicos.size.toLong() + 1
         topicos = topicos.plus(topico)
+    }
+
+    fun atualizar(form: AtualizarTopicoForm) {
+        val topico = topicos.stream().filter { t ->
+            t.id == form.id
+        }.findFirst().get()
+        topicos = topicos.minus(topico).plus(
+            Topico(
+                id = topico.id,
+                titulo = form.titulo,
+                mensagem = form.mensagem,
+                curso = topico.curso,
+                autor = topico.autor,
+                responstas = topico.responstas,
+                status = topico.status,
+                dataCriacao = topico.dataCriacao
+            )
+        )
+    }
+
+    fun deletar(id: Long) {
+        val topico = topicos.stream().filter { t ->
+            t.id == id
+        }.findFirst().get()
+        topicos = topicos.minus(topico)
     }
 }
